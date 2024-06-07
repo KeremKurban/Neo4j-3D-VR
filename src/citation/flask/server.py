@@ -1,13 +1,14 @@
 from flask import Flask, jsonify, render_template, request
 from neo4j import GraphDatabase
 import time
+import os
 
 app = Flask(__name__, static_folder='../../../static', template_folder='../../../templates')
 
-# Neo4j connection details
-uri = "bolt://localhost:7687"
-username = "neo4j"
-password = "password"
+# Neo4j connection details from environment variables
+uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+username = os.getenv("NEO4J_USERNAME", "neo4j")
+password = os.getenv("NEO4J_PASSWORD", "password")
 
 driver = GraphDatabase.driver(uri, auth=(username, password))
 
