@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Force Graph in VR</title>
+    <style> 
+        body { margin: 0; } 
+        canvas { display: block; }
+    </style>
+    <script src="https://unpkg.com/three/build/three.min.js"></script>
+    <script src="https://unpkg.com/3d-force-graph"></script>
+    <script src="https://unpkg.com/three/examples/js/vr/WebVR.js"></script>
+    <script src="https://unpkg.com/three/examples/js/vr/WebXR.js"></script>
+    <script type="importmap">{ "imports": { "three": "//unpkg.com/three/build/three.module.js" } }</script>
+</head>
+<body>
+    <div id="3d-graph"></div>
+    <script type="module">
+        import { UnrealBloomPass } from '//unpkg.com/three/examples/jsm/postprocessing/UnrealBloomPass.js';
+        import { VRButton } from '//unpkg.com/three/examples/jsm/webxr/VRButton.js';
+
+        const limit = 100;  // Set the limit for number of nodes to fetch
+
+        const Graph = ForceGraph3D()
+            (document.getElementById('3d-graph'))
+            .backgroundColor('#000003')
+            .nodeLabel('label')
+            .nodeColor(node => node.is_bbp ? 'blue' : 'yellow')
+            .nodeVal(node => node.is_bbp ? 10 : 5)  // Set node size based on is_bbp
+            .linkDirectionalParticles(2)  // Add particles to links for visibility
+            .linkDirectionalParticleWidth(0.5)  // Set the width of link particles to make them less bright
+            .linkWidth(1);  // Set the width of links
+
+        // Load data
+        const backendUrl = 'https://your-heroku-app.herokuapp.com';
+        Promise.all([
+            fetch(`${backendUrl}/nodes?limit=${limit}`).then(response => response.json()),
+            fetch(`${backendUrl}/links?limit=${limit}`).then(response => response.json())
+        ]).then(([nodes, links]) => {
+            // Combine nodes and links into a graph data object
+            const graphData = { nodes, links };
+
+            // Apply graph data to the 3D force graph
+            Graph.graphData(graphData);
+
+            // Apply UnrealBloomPass for post-processing
+            const bloomPass = new UnrealBloomPass();
+            bloomPass.strength = 4;
+            bloomPass.radius = 1;
+            bloomPass.threshold = 0;
+            Graph.postProcessingComposer().addPass(bloomPass);
+
+            // Add VR Button
+            document.body.appendChild(VRButton.createButton(Graph.renderer()));
+            Graph.renderer().xr.enabled = true;
+        });
+
+        // Adjust graph dimensions
+        Graph.width(window.innerWidth).height(window.innerHeight);
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', () => {
+            Graph.width(window.innerWidth).height(window.innerHeight);
+        });
+    </script>
+</body>
+</html>
