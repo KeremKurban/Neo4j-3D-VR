@@ -32,7 +32,7 @@
             .linkWidth(1);  // Set the width of links
 
         // Load data
-        const backendUrl = 'https://your-heroku-app.herokuapp.com';
+        const backendUrl = 'https://your-render-app.onrender.com';
         Promise.all([
             fetch(`${backendUrl}/nodes?limit=${limit}`).then(response => response.json()),
             fetch(`${backendUrl}/links?limit=${limit}`).then(response => response.json())
