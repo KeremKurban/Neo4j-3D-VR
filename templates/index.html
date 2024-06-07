@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Force Graph</title>
+    <script src="https://unpkg.com/3d-force-graph"></script>
+</head>
+<body>
+    <div id="3d-graph"></div>
+    <script>
+        // Initialize 3D Force Graph
+        const Graph = ForceGraph3D()
+            (document.getElementById('3d-graph'))
+            .graphData({nodes: [], links: []});
+
+        // Load data
+        fetch('/static/nodes.json')
+            .then(response => response.json())
+            .then(nodes => {
+                fetch('/static/links.json')
+                    .then(response => response.json())
+                    .then(links => {
+                        Graph.graphData({nodes, links});
+                    });
+            });
+
+        // Adjust graph dimensions
+        Graph.width(window.innerWidth).height(window.innerHeight);
+    </script>
+</body>
+</html>
