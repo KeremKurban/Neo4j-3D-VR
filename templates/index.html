@@ -21,6 +21,8 @@
                     .then(response => response.json())
                     .then(links => {
                         Graph.graphData({nodes, links});
+                        Graph.linkDirectionalParticles(5)
+                        .linkDirectionalParticleSpeed(1);
                     });
             });
 
